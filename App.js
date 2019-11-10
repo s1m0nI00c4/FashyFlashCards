@@ -18,7 +18,12 @@ export default class FlashyFlashCards extends React.Component {
      chosen: '',
      showDeckForm: false,
      showRenameDeckForm: false,
+     prova: 0,
    };
+
+   this.addParentCard = this.addParentCard.bind(this)
+   this.removeParentCard = this.removeParentCard.bind(this)
+   
  }
 
   addDeck = newDeck => {
@@ -30,6 +35,25 @@ export default class FlashyFlashCards extends React.Component {
   renameDeck = newName => {
     const newDecks = this.state.decks.map(item => (item.name === this.state.chosen)?{name: newName.name, cards: item.cards}: item)
     this.setState({decks: newDecks, chosen: '', showRenameDeckForm: false, })
+
+  }
+
+  addParentCard = newCard => {
+    const myDeck = this.state.decks.filter(item => item.name === this.state.chosen)[0]
+    const myNewDeck = {name: myDeck.name, cards: [...myDeck.cards, newCard]}
+    const myOldDeck = this.state.decks.filter(item => item.name !== this.state.chosen)
+    this.setState({decks: [...myOldDeck, myNewDeck]})
+  }
+
+  removeParentCard = myId => {
+
+    console.log("I'm in")
+    const myDeck = this.state.decks.filter(item => item.name === this.state.chosen)[0]
+    const myCards = myDeck.cards
+    const removed = myCards.splice(myId, 1)
+    const myNewDeck = {name: myDeck.name, cards: myCards}
+    const myOldDeck = this.state.decks.filter(item => item.name !== this.state.chosen)
+    this.setState({decks: [...myOldDeck, myNewDeck]})
 
   }
 
@@ -57,6 +81,7 @@ export default class FlashyFlashCards extends React.Component {
           onPress={() => this.setState({showDeckForm: true})} 
           color="#66ff66"
         />
+        <Text>{this.state.chosen}</Text>
       </View>)} 
 
     else { return (
@@ -70,6 +95,8 @@ export default class FlashyFlashCards extends React.Component {
           title={chosenDeck} 
           id={0} 
           cards={this.state.decks.filter(item => item.name === chosenDeck)[0].cards}
+          addParentCard={this.addParentCard}
+          removeParentCard={this.removeParentCard}
         />
         <Button 
           title="Rename this Deck" 
@@ -86,18 +113,12 @@ export default class FlashyFlashCards extends React.Component {
           title="Delete this Deck" 
         />
       </View>
+      
     )}
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    //flex: 1,
-    //justifyContent: 'center',
-    paddingTop: Constants.statusBarHeight,
-    backgroundColor: '#ecf0f1',
-    padding: 8,
-  },
 
   paragraph: {
     margin: 14,
